@@ -42,8 +42,10 @@ kmeans = KMeans(k=2)
 #creacion del mapa de transformaciones
 pipeline = Pipeline(stages=[tokenizer, remover, hashingTF, idf, kmeans])
 
+#inserta el dataframe como el inicio de las transformaciones
 model = pipeline.fit(df)
 
+#ejecuta las trasformaciones mapeadas y guarda el resultado
 results = model.transform(df)
 results.cache()
 
