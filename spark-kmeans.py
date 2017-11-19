@@ -4,21 +4,31 @@ from pyspark.sql.types import *
 from pyspark.ml.feature import HashingTF, IDF, Tokenizer, CountVectorizer, StopWordsRemover
 from pyspark.ml.clustering import KMeans
 from pyspark.ml import Pipeline
+import time
 
-#Contexto Local de SPARK
-sc = SparkContext('local')
+#Contexto de SPARK
+sc = SparkContext('')
 spark = SparkSession(sc)
 
 print("PROCESO COMENZADO")
+start_time = time.time()
+
 
 #Lee todos los contenidos de la carpeta y crea un RDD (path, contenido)
-files = sc.wholeTextFiles("hdfs:///user/lcarva12/pruebaKmeans/")
+#Dataset Gutenberg completo ~3000 Documentos
+#files = sc.wholeTextFiles("hdfs:///user/dmedina7/gutenberg")
+
+#Dataset Muestra de Gutenberg 180 Documentos
+#files = sc.wholeTextFiles("hdfs:///user/lcarva12/gutenSample")
+
+#Dataset Pruebas 5 Documentos
+files = sc.wholeTextFiles("hdfs:///user/lcarva12/pruebaKmeans")
 
 #Imprime 5 primeros registros en el RDD, IMPRIME EL CONTENIDO DEL ARCHIVO COMPLETO
 print("RDD:--------------------------")
 #print(files.take(5))
-for r in files.take(5):
-  print(r)
+#for r in files.take(5):
+#  print(r)
 
 #Esquema a aplicarle al RDD para volverlo un dataframe con path y contenido del archivo
 schema =  StructType([StructField ("path" , StringType(), True) , 
@@ -36,8 +46,8 @@ print("NUMERO DE ARCHIVOS: ", df.cache().count(), "-------------")
 tokenizer = Tokenizer(inputCol="text", outputCol="tokens")
 remover = StopWordsRemover(inputCol="tokens", outputCol="stopWordsRemovedTokens")
 hashingTF = HashingTF(inputCol="stopWordsRemovedTokens", outputCol="rawFeatures", numFeatures=2000)
-idf = IDF(inputCol="rawFeatures", outputCol="features", minDocFreq=1)
-kmeans = KMeans(k=2)
+idf = IDF(inputCol="rawFeatures", outputCol="features", minDocFreq=5)
+kmeans = KMeans(k=5)
 
 #creacion del mapa de transformaciones
 pipeline = Pipeline(stages=[tokenizer, remover, hashingTF, idf, kmeans])
@@ -54,5 +64,6 @@ print("RESULTADOS:------------------")
 results.show()
 
 print("PROCESO TERMINADO")
+print("-------TIEMPO DE EJECUCION: %s SEGUNDOS -------" % (time.time()-start_time))
 
 #display(results.groupBy("prediction").count())  # Note "display" is for Databricks; use show() for OSS Apache Spark
