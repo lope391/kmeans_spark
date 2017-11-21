@@ -16,7 +16,7 @@ Para ejecutar el programa en el cluster ejecutar el archivo exec.sh
      
 Dentro de este archivo se pueden editar parametros de memoria maxima o numero de nodos
 
-    spark-submit --master yarn --deploy-mode cluster --executor-memory {4G} --num-executors {4} spark-kmeans.py  
+    spark-submit --master yarn --deploy-mode cluster --executor-memory {4G} --num-executors {4} spark-kmeans.py
     
 # Parametros
 Dentro del archivo python se puede editar varios campos:
@@ -35,3 +35,10 @@ En la linea 50 se define el numero de clusters a intentar buscar
 
     kmeans = KMeans(k={5})
     
+    
+# Resultados
+Para acceder a los resultados se necesita ver el log que genera YARN mediante el siguiente comando
+     
+     yarn logs -applicationId <App_Id>
+
+Dentro de este archivo hay mucha información de la ejecución interna de SPARK pero al final estan las impresiones de los resultados.
